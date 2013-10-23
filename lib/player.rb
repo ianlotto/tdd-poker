@@ -1,33 +1,86 @@
 class Player
-  attr_reader :name, :bankroll
-  attr_accessor :hand
+  attr_reader :bankroll, :hand
 
-  def initialize(name, bankroll)
-    @name, @bankroll = name, bankroll
+  def self.buy_in(bankroll)
+    Player.new(bankroll)
   end
 
-  def place_bet
-    print "#{name.capitalize}, please place your bet: "
-    bet = gets.chomp.to_i
-    raise "player can't cover bet" if @bankroll < bet
+  def initialize(bankroll)
+    @bankroll = bankroll
+  end
 
-    @bankroll -= bet
+  def deal_in(hand)
+    @hand = hand
+  end
+
+  def respond_bet
+    begin
+      print "(b)et or (f)old? > "
+      response = gets.chomp.downcase[0]
+      raise 'must be (b)et or (f)old' unless ['b', 'f'].include?(response)
+      case response
+      when 'b' then :bet
+      when 'f' then :fold
+      end
+    rescue
+      retry
+    end
+  end
+
+  def get_bet
+    begin
+      print "Bet (bankroll: $#{bankroll}) > "
+      bet = gets.chomp.to_i
+      raise 'not enough money' unless bet <= bankroll
+    rescue
+      retry
+    end
+
     bet
   end
 
-  def identify_discards
-    puts hand.to_s
-    print "#{name.capitalize}, which cards would you like to discard? (1, 2...) "
-    gets.chomp.split(', ').map { |char| char.to_i - 1 }
+  def get_cards_to_trade
+    print "Cards to trade? (ex. '1, 4, 5') > "
+    card_indices = gets.chomp.split(', ').map(&:to_i)
+    raise 'cannot trade more than three cards' unless card_indices.count <= 3
+    cards = card_indices.map { |i| hand.cards[i - 1] }
   end
 
-  def recieve_winnings(winnings)
-    @bankroll += winnings
+  def take_bet(amount)
+    raise 'not enough money' unless amount <= bankroll
+    @bankroll -= amount
+    amount
   end
 
-  def return_cards(deck)
-    cards = hand.return_cards((0..4).to_a)
+  def receive_winnings(amount)
+    @bankroll += amount
+  end
+
+  def return_cards
+    cards = hand.cards
     @hand = nil
-    deck.return(cards)
+    cards
+  end
+
+  def fold
+    @folded = true
+  end
+
+  def unfold
+    @folded = false
+  end
+
+  def folded?
+    bankroll.zero? || @folded
+  end
+
+  def trade_cards(old_cards, new_cards)
+    hand.trade_cards(old_cards, new_cards)
+  end
+
+  def <=>(other_player)
+    p hand
+    p other_player.hand
+    hand <=> other_player.hand
   end
 end
