@@ -1,96 +1,51 @@
 require 'rspec'
-require 'card'
-require 'deck'
 require 'hand'
+require 'card'
 
 describe Hand do
-  describe "::deal_from" do
-    it "deals a hand of five cards" do
-      cards = [
-        Card.new(:spades,   :deuce),
-        Card.new(:clubs,    :three),
-        Card.new(:hearts,   :four),
-        Card.new(:diamonds, :five),
-        Card.new(:spades,   :queen)
-      ]
+  let(:cards) {[
+                Card.new(:spades, :ten),
+                Card.new(:hearts, :five),
+                Card.new(:hearts, :ace),
+                Card.new(:diamonds, :deuce),
+                Card.new(:hearts, :deuce)
+              ]}
 
-      deck = Deck.new(cards.dup)
-      hand = Hand.deal_from(deck)
+  subject(:hand) { Hand.new(cards) }
+  its(:cards) { should =~ cards }
 
-      deck.count.should == 0
-      hand.cards.should =~ cards
+  describe '#initialize' do
+    it 'raises an error if not five cards' do
+      expect do
+        Hand.new(cards[0..3])
+      end.to raise_error 'must have five cards'
     end
   end
 
-  # context "with bad hand" do
-  #   subject(:bad_hand) do
-  #     Hand.new([
-  #         Card.new(:spades, :deuce),
-  #         Card.new(:clubs,  :four),
-  #         Card.new(:spades, :six),
-  #         Card.new(:clubs,  :eight),
-  #         Card.new(:hearts, :nine)
-  #       ])
-  #
-  #     deck = Deck.new(cards.dup)
-  #   end
+  describe '#trade_cards' do
+    let!(:take_cards) { hand.cards[0..1] }
+    let!(:new_cards) { [Card.new(:spades, :five), Card.new(:clubs, :three)] }
 
-    # describe "#return_cards" do
-#
-#       it "reduces the size of your hand" do
-#         bad_hand.
-#       end
-#
-#       it "increases the size of the deck"
-#
-#     end
-#
-#     describe "#add_cards" do
-#
-#       it "increases the size of your hand"
-#       it "decreases the size of the deck"
-#       it "will not increase hand size above five"
-#
-#     end
-
-    describe "#replace_cards" do
-
-      it "changes the cards in your hand" do
-        cards = [
-          Card.new(:spades,   :deuce),
-          Card.new(:clubs,    :three),
-          Card.new(:hearts,   :four),
-          Card.new(:diamonds, :five),
-          Card.new(:spades,   :queen),
-          Card.new(:spades,   :six)
-        ]
-
-        deck = Deck.new(cards.dup)
-        hand = Hand.deal_from(deck)
-        expect do
-          hand.replace_cards([1], deck.take(1))
-        end.to change{ hand.cards }
-      end
-
-      it "keeps the hand size at five" do
-        cards = [
-          Card.new(:spades,   :deuce),
-          Card.new(:clubs,    :three),
-          Card.new(:hearts,   :four),
-          Card.new(:diamonds, :five),
-          Card.new(:spades,   :queen),
-          Card.new(:spades,   :six)
-        ]
-
-        deck = Deck.new(cards.dup)
-        hand = Hand.deal_from(deck)
-        expect do
-          hand.replace_cards([1], deck.take(1))
-        end.to_not change{ hand.count }
-      end
-
+    it 'discards specified cards' do
+      hand.trade_cards(take_cards, new_cards)
+      hand.cards.should_not include(*take_cards)
     end
 
-  # end
+    it 'takes specified cards' do
+      hand.trade_cards(take_cards, new_cards)
+      hand.cards.should include(*new_cards)
+    end
 
+    it 'raises an error if trade does not result in five cards' do
+      expect do
+        hand.trade_cards(hand.cards[0..0], new_cards)
+      end.to raise_error 'must have five cards'
+    end
+
+    it 'raises an error if trade tries to discard unowned card' do
+      expect do
+        hand.trade_cards([Card.new(:hearts, :ten)], new_cards[0..0])
+      end.to raise_error 'cannot discard unowned card'
+    end
+  end
 end

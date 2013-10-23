@@ -1,8 +1,6 @@
-require_relative './poker_hands'
+require 'card'
 
 class Hand
-  include PokerHands
-
   attr_reader :cards
 
   def initialize(cards)

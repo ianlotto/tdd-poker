@@ -28,34 +28,6 @@ describe Player do
   its(:bankroll) { should == 200_000 }
   its("hand.cards.count") { should == 5 }
 
-  # describe "#place_bet" do
-#     let(:game) { double("game", :take_bet => nil) }
-#
-#     it "registers bet with game" do
-#
-#       player.stub!(:gets).and_return("10000")
-#       #@mirror.should_receive(:puts).with("phrase")
-#       player.place_bet(game)
-#
-#       game.should_receive(:take_bet).with(player, 10_000)
-#     end
-#
-#     it "deducts bet from bankroll" do
-#       player.stub!(:gets).and_return("10000")
-#       player.place_bet(game)
-#
-#       player.bankroll.should == 190_000
-#     end
-#
-#     it "enforces limits" do
-#       player.stub!(:gets).and_return("1000000000")
-#       expect do
-#         player.place_bet(game)
-#       end.to raise_error("player can't cover bet")
-#     end
-#
-#   end
-
   describe "#recieve_winnings" do
     it "adds to winnings" do
       expect do
