@@ -1,8 +1,7 @@
 require 'card'
 
-# Represents a deck of playing cards.
 class Deck
-  # Returns an array of all 52 playing cards.
+  
   def self.all_cards
     cards =[]
     Card.suits.each do |suit|
