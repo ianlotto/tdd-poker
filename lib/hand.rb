@@ -1,8 +1,4 @@
 class Hand
-  # This is called a *factory method*; it's a *class method* that
-  # takes the a `Deck` and creates and returning a `Hand`
-  # object. This is in contrast to the `#initialize` method that
-  # expects an `Array` of cards to hold.
   def self.deal_from(deck)
     self.new(deck.take(5))
   end

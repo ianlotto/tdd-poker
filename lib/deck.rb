@@ -1,4 +1,5 @@
 require 'card'
+require 'hand'
 
 class Deck
   
@@ -16,33 +17,26 @@ class Deck
   def initialize(cards = Deck.all_cards)
     @cards = cards
   end
+  
+  def deal_hand
+    Hand.new(take(5))
+  end
 
-  # Returns the number of cards in the deck.
   def count
     @cards.count
-  end
-
-  def include?(card)
-    @cards.include?(card)
-  end
-
-  def peek
-    @cards[0]
   end
 
   def shuffle
     @cards.shuffle!
   end
 
-  # Takes `n` cards from the top of the deck.
   def take(n)
-    raise "not enough cards" if n > @cards.length
+    raise "not enough cards" if n > count
     @cards.shift(n)
   end
 
-  # Returns an array of cards to the bottom of the deck.
   def return(cards)
-    @cards += cards
+    @cards.push(*cards)
   end
 
 end
