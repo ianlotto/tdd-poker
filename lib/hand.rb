@@ -1,35 +1,44 @@
-class Hand
-  def self.deal_from(deck)
-    self.new(deck.take(5))
-  end
+require_relative './poker_hands'
 
-  attr_accessor :cards
+class Hand
+  include PokerHands
+
+  attr_reader :cards
 
   def initialize(cards)
-    @cards = cards
+    raise 'must have five cards' unless cards.count == 5
+    @cards = cards.sort
   end
 
-  def add_cards(cards)
-    @cards << cards
+  def self.winner(hands)
+    hands.sort.last
   end
 
-  def return_cards(card_indicies)
-    returned_cards = []
-    card_indicies.each { |i| returned_cards << @cards.delete_at(i) }
-
-    returned_cards
-  end
-
-  # def replace_cards(card_indices, cards)
-#     add_cards(cards)
-#     return_cards(card_indices)
-#   end
-
-  def count
-    @cards.count
+  def trade_cards(old_cards, new_cards)
+    raise 'must have five cards' unless old_cards.count == new_cards.count
+    raise 'cannot discard unowned card' unless has_cards?(old_cards)
+    take_cards(new_cards) && discard_cards(old_cards) && sort!
+    old_cards
   end
 
   def to_s
-    @cards.join(",")
+    cards.join(' ')
+  end
+
+  private
+  def sort!
+    @cards.sort!
+  end
+
+  def take_cards(cards)
+    @cards.push(*cards)
+  end
+
+  def discard_cards(old_cards)
+    old_cards.each { |card| cards.delete(card) }
+  end
+
+  def has_cards?(old_cards)
+    old_cards.all? { |card| cards.include?(card) }
   end
 end
